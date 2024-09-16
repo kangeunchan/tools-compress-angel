@@ -584,7 +584,7 @@ void *processFileThread(void *arg) {
 }
 
 // 파일 선택 함수 (Windows와 다른 OS 구분)
-char *chooseFile() {
+char *chooseFile(GtkWindow *parent) {
 #ifdef _WIN32
     OPENFILENAME ofn;
     char szFile[MAX_PATH] = "";
@@ -601,7 +601,7 @@ char *chooseFile() {
 #else
     GtkWidget *dialog;
     dialog = gtk_file_chooser_dialog_new("파일 선택",
-                                         NULL,
+                                         parent,
                                          GTK_FILE_CHOOSER_ACTION_OPEN,
                                          "_취소", GTK_RESPONSE_CANCEL,
                                          "_열기", GTK_RESPONSE_ACCEPT,
@@ -619,14 +619,14 @@ char *chooseFile() {
 
 // 압축 버튼 클릭 시 호출되는 함수
 void on_compress_clicked(GtkWidget *widget, gpointer data) {
-    GtkWidget *window = (GtkWidget *)data;
-    GtkWidget *progressBar = g_object_get_data(G_OBJECT(window), "progress_bar");
-    GtkWidget *statusLabel = g_object_get_data(G_OBJECT(window), "status_label");
-    GtkWidget *logView = g_object_get_data(G_OBJECT(window), "log_view");
-    GtkWidget *fileInfoLabel = g_object_get_data(G_OBJECT(window), "file_info_label");
-    GtkWidget *speedLabel = g_object_get_data(G_OBJECT(window), "speed_label");
+    GtkWidget *window = GTK_WIDGET(data);
+    GtkWidget *progressBar = GTK_WIDGET(g_object_get_data(G_OBJECT(window), "progress_bar"));
+    GtkWidget *statusLabel = GTK_WIDGET(g_object_get_data(G_OBJECT(window), "status_label"));
+    GtkWidget *logView = GTK_WIDGET(g_object_get_data(G_OBJECT(window), "log_view"));
+    GtkWidget *fileInfoLabel = GTK_WIDGET(g_object_get_data(G_OBJECT(window), "file_info_label"));
+    GtkWidget *speedLabel = GTK_WIDGET(g_object_get_data(G_OBJECT(window), "speed_label"));
 
-    char *inputFile = chooseFile();
+    char *inputFile = chooseFile(GTK_WINDOW(window));
     if (inputFile != NULL) {
         char *outputFile = g_strdup_printf("%s.adv", inputFile);
 
@@ -651,14 +651,14 @@ void on_compress_clicked(GtkWidget *widget, gpointer data) {
 
 // 해제 버튼 클릭 시 호출되는 함수
 void on_decompress_clicked(GtkWidget *widget, gpointer data) {
-    GtkWidget *window = (GtkWidget *)data;
-    GtkWidget *progressBar = g_object_get_data(G_OBJECT(window), "progress_bar");
-    GtkWidget *statusLabel = g_object_get_data(G_OBJECT(window), "status_label");
-    GtkWidget *logView = g_object_get_data(G_OBJECT(window), "log_view");
-    GtkWidget *fileInfoLabel = g_object_get_data(G_OBJECT(window), "file_info_label");
-    GtkWidget *speedLabel = g_object_get_data(G_OBJECT(window), "speed_label");
+    GtkWidget *window = GTK_WIDGET(data);
+    GtkWidget *progressBar = GTK_WIDGET(g_object_get_data(G_OBJECT(window), "progress_bar"));
+    GtkWidget *statusLabel = GTK_WIDGET(g_object_get_data(G_OBJECT(window), "status_label"));
+    GtkWidget *logView = GTK_WIDGET(g_object_get_data(G_OBJECT(window), "log_view"));
+    GtkWidget *fileInfoLabel = GTK_WIDGET(g_object_get_data(G_OBJECT(window), "file_info_label"));
+    GtkWidget *speedLabel = GTK_WIDGET(g_object_get_data(G_OBJECT(window), "speed_label"));
 
-    char *inputFile = chooseFile();
+    char *inputFile = chooseFile(GTK_WINDOW(window));
     if (inputFile != NULL) {
         // ".adv" 확장자가 있는지 확인
         size_t len = strlen(inputFile);
@@ -761,10 +761,6 @@ int main(int argc, char *argv[]) {
     g_object_set_data(G_OBJECT(window), "log_view", logView);
     g_object_set_data(G_OBJECT(window), "file_info_label", fileInfoLabel);
     g_object_set_data(G_OBJECT(window), "speed_label", speedLabel);
-
-    // 진행률 업데이트를 위한 타이머 설정
-    // 주기적으로 진행률을 업데이트하여 UI 반응성을 유지
-    // 실제 스레드에서 진행률을 업데이트하려면 추가적인 메커니즘이 필요할 수 있습니다
 
     gtk_widget_show_all(window);
 
